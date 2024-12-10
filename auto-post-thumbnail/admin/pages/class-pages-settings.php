@@ -22,7 +22,7 @@ class WAPT_Settings extends WAPT_Page {
 	 * Mainly used to navigate between pages.
 	 *
 	 * @since 1.0.0
-	 * @see   FactoryPages479_AdminPage
+	 * @see   FactoryPages480_AdminPage
 	 *
 	 * @var string
 	 */
@@ -91,7 +91,7 @@ class WAPT_Settings extends WAPT_Page {
 	 *
 	 * @return void
 	 * @since 3.8.1
-	 * @see   Wbcr_FactoryPages479_AdminPage
+	 * @see   Wbcr_FactoryPages480_AdminPage
 	 */
 	public function assets( $scripts, $styles ) {
 		parent::assets( $scripts, $styles );

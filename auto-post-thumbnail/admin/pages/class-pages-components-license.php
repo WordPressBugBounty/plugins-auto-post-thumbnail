@@ -72,12 +72,12 @@ class WAPT_ComponentsLicensePage extends WAPT_Page {
 	/**
 	 * WCL_LicensePage constructor.
 	 *
-	 * @param \Wbcr_Factory479_Plugin $plugin
+	 * @param \Wbcr_Factory480_Plugin $plugin
 	 *
 	 * @author Alexander Kovalev <alex.kovalevv@gmail.com>
 	 *
 	 */
-	public function __construct( Wbcr_Factory479_Plugin $plugin ) {
+	public function __construct( Wbcr_Factory480_Plugin $plugin ) {
 		$this->menu_title                  = __( 'License', 'robin-image-optimizer' );
 		$this->page_menu_short_description = __( 'Product activation', 'robin-image-optimizer' );
 		$this->plan_name                   = __( 'Clearfy Business', 'robin-image-optimizer' );
@@ -96,17 +96,17 @@ class WAPT_ComponentsLicensePage extends WAPT_Page {
 	 *
 	 * @return void
 	 * @since 1.0.0
-	 * @see   FactoryPages479_AdminPage
+	 * @see   FactoryPages480_AdminPage
 	 *
 	 */
 	public function assets( $scripts, $styles ) {
 		parent::assets( $scripts, $styles );
 
-		$this->styles->add(FACTORY_TEMPLATES_132_URL . '/assets/css/components.css');
+		$this->styles->add(FACTORY_TEMPLATES_134_URL . '/assets/css/components.css');
 
 		/**
-		 * @param Wbcr_Factory479_StyleList $styles
-		 * @param Wbcr_Factory479_ScriptList $scripts
+		 * @param Wbcr_Factory480_StyleList $styles
+		 * @param Wbcr_Factory480_ScriptList $scripts
 		 *
 		 * @since 1.4.0
 		 *
@@ -133,7 +133,7 @@ class WAPT_ComponentsLicensePage extends WAPT_Page {
 				<?php _e( 'These are components of the plugin bundle. When you activate the plugin, all the components turned on by default. If you don’t need some function, you can easily turn it off on this page.', 'clearfy' ) ?>
             </p>
         </div>
-        <div class="wbc-factory-templates-132-components">
+        <div class="wbc-factory-templates-134-components">
 			<?php
 			/**
 			 * @param array $components

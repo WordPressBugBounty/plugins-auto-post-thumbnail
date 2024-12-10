@@ -14,7 +14,7 @@ require_once WAPT_PLUGIN_DIR . '/admin/class-page-logger.php';
  * @copyright (c) 2018, Webcraftic
  * @version       1.0
  */
-class WAPT_Log extends Wbcr_FactoryLogger147_PageBase {
+class WAPT_Log extends Wbcr_FactoryLogger149_PageBase {
 
 	/**
 	 * The id of the page in the admin menu.
@@ -22,7 +22,7 @@ class WAPT_Log extends Wbcr_FactoryLogger147_PageBase {
 	 * Mainly used to navigate between pages.
 	 *
 	 * @since 1.0.0
-	 * @see   FactoryPages479_AdminPage
+	 * @see   FactoryPages480_AdminPage
 	 *
 	 * @var string
 	 */

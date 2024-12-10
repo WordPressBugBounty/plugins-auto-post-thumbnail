@@ -21,7 +21,7 @@ class WAPT_ImageSettings extends WAPT_Page {
 	 * Mainly used to navigate between pages.
 	 *
 	 * @since 1.0.0
-	 * @see   FactoryPages479_AdminPage
+	 * @see   FactoryPages480_AdminPage
 	 *
 	 * @var string
 	 */
@@ -95,7 +95,7 @@ class WAPT_ImageSettings extends WAPT_Page {
 		$this->template_name    = 'settings';
 		$this->page_parent_page = $plugin->getPrefix() . 'settings';
 
-		add_action( 'wbcr_factory_forms_479_register_controls', function () {
+		add_action( 'wbcr_factory_forms_480_register_controls', function () {
 			$colorControls = [
 				[
 					'type'    => 'wapt-color',
@@ -129,7 +129,7 @@ class WAPT_ImageSettings extends WAPT_Page {
 	 *
 	 * @return void
 	 * @since 3.8.1
-	 * @see   Wbcr_FactoryPages479_AdminPage
+	 * @see   Wbcr_FactoryPages480_AdminPage
 	 */
 	public function assets( $scripts, $styles ) {
 		parent::assets( $scripts, $styles );

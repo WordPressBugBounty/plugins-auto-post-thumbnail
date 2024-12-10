@@ -3,7 +3,7 @@
 Plugin Name: Auto Featured Image (Auto Post Thumbnail)
 Plugin URI: https://cm-wp.com/apt
 Description: Automatically generate the Featured Image from the first image in post or any custom post type only if Featured Image is not set manually. Featured Image Generation From Title. Native image search for Elementor, Gutenberg, Classic Editor.
-Version: 4.1.4
+Version: 4.1.5
 Requires PHP: 7.4
 Author: Creative Motion <support@cm-wp.com>
 Author URI: https://cm-wp.com
@@ -39,7 +39,7 @@ require_once dirname( __FILE__ ) . '/libs/factory/core/includes/class-factory-re
 $plugin_info = [
 	'prefix'           => 'wapt_',
 	'plugin_name'      => 'wbcr_apt',
-	'plugin_title'     => __( 'Auto Featured Image', 'apt' ),
+	'plugin_title'     => 'Auto Featured Image',
 
 	// Служба поддержки.
 	'support_details'  => [
@@ -89,19 +89,19 @@ $plugin_info = [
 	],
 
 	'load_factory_modules' => [
-		[ 'libs/factory/bootstrap', 'factory_bootstrap_481', 'admin' ],
-		[ 'libs/factory/forms', 'factory_forms_479', 'admin' ],
-		[ 'libs/factory/pages', 'factory_pages_479', 'admin' ],
-		[ 'libs/factory/templates', 'factory_templates_132', 'admin' ],
-		[ 'libs/factory/freemius', 'factory_freemius_169', 'all' ],
-		[ 'libs/factory/adverts', 'factory_adverts_158', 'admin' ],
+		[ 'libs/factory/bootstrap', 'factory_bootstrap_482', 'admin' ],
+		[ 'libs/factory/forms', 'factory_forms_480', 'admin' ],
+		[ 'libs/factory/pages', 'factory_pages_480', 'admin' ],
+		[ 'libs/factory/templates', 'factory_templates_134', 'admin' ],
+		[ 'libs/factory/freemius', 'factory_freemius_170', 'all' ],
+		[ 'libs/factory/adverts', 'factory_adverts_159', 'admin' ],
 		[ 'libs/factory/feedback', 'factory_feedback_131', 'admin' ],
-		[ 'libs/factory/logger', 'factory_logger_147', 'all' ],
+		[ 'libs/factory/logger', 'factory_logger_149', 'all' ],
 		[ 'libs/factory/processing', 'factory_processing_113', 'all' ],
 	],
 ];
 
-$wapt_compatibility = new Wbcr_Factory479_Requirements( __FILE__, array_merge( $plugin_info, [
+$wapt_compatibility = new Wbcr_Factory480_Requirements( __FILE__, array_merge( $plugin_info, [
 	'plugin_already_activate' => defined( 'WAPT_PLUGIN_ACTIVE' ),
 	'required_php_version'    => '7.4',
 	'required_wp_version'     => '5.6.0',

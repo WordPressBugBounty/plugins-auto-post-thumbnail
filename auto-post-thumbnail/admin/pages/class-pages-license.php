@@ -1,8 +1,8 @@
 <?php
 
 // Exit if accessed directly
-use WBCR\Factory_479\Premium\Interfaces\License;
-use WBCR\Factory_479\Premium\Provider;
+use WBCR\Factory_480\Premium\Interfaces\License;
+use WBCR\Factory_480\Premium\Provider;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 2.0.7
  */
-class WAPT_License extends WBCR\Factory_Templates_132\Pages\License {
+class WAPT_License extends WBCR\Factory_Templates_134\Pages\License {
 
 	/**
 	 * The id of the page in the admin menu.
@@ -21,7 +21,7 @@ class WAPT_License extends WBCR\Factory_Templates_132\Pages\License {
 	 * Mainly used to navigate between pages.
 	 *
 	 * @since 1.0.0
-	 * @see   FactoryPages479_AdminPage
+	 * @see   FactoryPages480_AdminPage
 	 *
 	 * @var string
 	 */

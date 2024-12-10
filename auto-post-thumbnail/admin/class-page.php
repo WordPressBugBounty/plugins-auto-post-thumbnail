@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class WAPT_Page extends WBCR\Factory_Templates_132\Pages\PageBase {
+class WAPT_Page extends WBCR\Factory_Templates_134\Pages\PageBase {
 
 	/**
 	 * Show on the page a search form for search options of plugin?

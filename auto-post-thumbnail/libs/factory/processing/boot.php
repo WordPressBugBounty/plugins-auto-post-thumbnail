@@ -36,10 +36,10 @@ require_once( FACTORY_PROCESSING_113_DIR . '/includes/classes/wp-background-proc
 
 
 /**
- * @param Wbcr_Factory479_Plugin $plugin
+ * @param Wbcr_Factory480_Plugin $plugin
  */
 add_action( 'wbcr_factory_processing_113_plugin_created', function ( $plugin ) {
-	/* @var Wbcr_Factory479_Plugin $plugin */
+	/* @var Wbcr_Factory480_Plugin $plugin */
 
 	/* Settings of Processing
 	$settings = [

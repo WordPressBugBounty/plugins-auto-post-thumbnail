@@ -9,7 +9,7 @@ $generate_option = $data['generate_option'];
 ?>
 
 <div class="wrap" id="wapt-generate-page">
-	<div class="factory-bootstrap-481 factory-fontawesome-000">
+	<div class="factory-bootstrap-482 factory-fontawesome-000">
 		<div class="row wapt-statistic-row">
 			<div class="wapt-generate-statistic">
 				<div class="wapt-chart-container">

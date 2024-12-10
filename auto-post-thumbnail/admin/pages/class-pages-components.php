@@ -13,7 +13,7 @@ if( !defined('ABSPATH') ) {
 	exit;
 }
 
-class WAPT_ComponentsPage extends \WBCR\Factory_Templates_132\Pages\Components {
+class WAPT_ComponentsPage extends \WBCR\Factory_Templates_134\Pages\Components {
 
 	/**
 	 * {@inheritdoc}
