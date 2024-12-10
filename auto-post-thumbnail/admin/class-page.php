@@ -68,6 +68,9 @@ class WAPT_Page extends WBCR\Factory_Templates_134\Pages\PageBase {
 
 		return $widgets;
 	}
+
+	// todo: For compatibility with the old version of the premium plugin
+	public static function group_header() {}
 }
 
 

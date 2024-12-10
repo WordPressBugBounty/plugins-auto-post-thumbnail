@@ -4,7 +4,7 @@ Tags: post thumbnails, featured image, elementor, thumbnails, featured image fro
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 4.1.5
+Stable tag: 4.1.6
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,8 @@ This section describes how to install the plugin and get it working.
 11. Text settings
 
 == Changelog ==
+= 4.1.6 (09.12.2024) =
+* Added: Сompatibility with premium plugin
 
 = 4.1.5 (09.12.2024) =
 * Added: Wordpress 6.7 compatibility
