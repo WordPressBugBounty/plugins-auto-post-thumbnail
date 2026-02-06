@@ -1,14 +1,16 @@
 <?php
-/*
-Plugin Name: Auto Featured Image (Auto Post Thumbnail)
-Plugin URI: https://cm-wp.com/apt
-Description: Automatically generate the Featured Image from the first image in post or any custom post type only if Featured Image is not set manually. Featured Image Generation From Title. Native image search for Elementor, Gutenberg, Classic Editor.
-Version: 4.1.7
-Requires PHP: 7.4
-Author: Creative Motion <support@cm-wp.com>
-Author URI: https://cm-wp.com
-Text Domain: apt
-Domain Path: /languages
+/**
+ * Plugin Name: Auto Featured Image (Auto Post Thumbnail)
+ * Plugin URI: https://cm-wp.com/apt
+ * Description: Automatically generate the Featured Image from the first image in post or any custom post type only if Featured Image is not set manually. Featured Image Generation From Title. Native image search for Elementor, Gutenberg, Classic Editor.
+ * Version: 4.2.2
+ * Requires PHP: 7.4
+ * Author: Themeisle <contact@themeisle.com>
+ * Author URI: https://themeisle.com
+ * Text Domain: auto-post-thumbnail
+ * WordPress Available:  yes
+ * Requires License:    no
+ * Domain Path: /languages
 */
 
 /**
@@ -95,7 +97,6 @@ $plugin_info = [
 		[ 'libs/factory/templates', 'factory_templates_134', 'admin' ],
 		[ 'libs/factory/freemius', 'factory_freemius_170', 'all' ],
 		[ 'libs/factory/adverts', 'factory_adverts_159', 'admin' ],
-		[ 'libs/factory/feedback', 'factory_feedback_131', 'admin' ],
 		[ 'libs/factory/logger', 'factory_logger_149', 'all' ],
 		[ 'libs/factory/processing', 'factory_processing_113', 'all' ],
 	],
@@ -142,6 +143,8 @@ require_once WAPT_PLUGIN_DIR . '/includes/class-wapt-image.php';
 require_once WAPT_PLUGIN_DIR . '/includes/image-search/boot.php';
 
 try {
+
+	require_once WAPT_PLUGIN_DIR . '/vendor/autoload.php';
 	new WAPT_Plugin( __FILE__, array_merge( $plugin_info, [
 		'plugin_version'     => WAPT_PLUGIN_VERSION,
 		'plugin_text_domain' => $wapt_compatibility->get_text_domain(),

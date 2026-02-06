@@ -717,6 +717,140 @@ class AutoPostThumbnails {
 		die();
 	}
 
+		/**
+	 * Fetch image from URL and generate required thumbnails.
+	 *
+	 * @param string $image
+	 * @param string $title
+	 * @param int $post_id
+	 *
+	 * @return int|WP_Error|null
+	 */
+	public function generate_post_thumb( $image, $title, $post_id ) {
+		// Get the URL now for further processing
+		$imageUrl = $image;
+		if ( $imageUrl === wp_make_link_relative( $imageUrl ) ) {
+			$imageUrl = home_url( $imageUrl );
+		}
+		$imageTitle = $title;
+
+		// Get the file name
+		$filename = substr( $imageUrl, ( strrpos( $imageUrl, '/' ) ) + 1 );
+		// Ð¸ÑÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ Ð¿Ð¾ÑÐ»Ðµ Ð¸Ð¼ÐµÐ½Ð¸ Ñ„Ð°Ð¹Ð»Ð°
+		if ( strrpos( $filename, '?' ) ) {
+			$filename = substr( $filename, 0, strrpos( $filename, '?' ) );
+		}
+
+		if ( ! ( ( $uploads = wp_upload_dir( current_time( 'mysql' ) ) ) && false === $uploads['error'] ) ) {
+			return null;
+		}
+
+		// Generate unique file name
+		$filename = wp_unique_filename( $uploads['path'], $filename );
+
+		$new_file = $uploads['path'] . "/$filename";
+		$ext      = pathinfo( $new_file, PATHINFO_EXTENSION );
+		if ( empty( $ext ) ) {
+			$ext      = 'jpg';
+			$filename .= ".{$ext}";
+			$new_file .= ".{$ext}";
+		}
+
+		$wp_filetype = wp_check_filetype( $filename );
+
+		$allow_mime_types = [
+			'image/jpeg',
+			'image/png',
+			'image/gif',
+			'image/bmp',
+			'image/tiff',
+			'image/webp',
+			'image/avif'
+		];
+
+
+		if ( ( ! $wp_filetype['ext'] || ! in_array( $wp_filetype['type'], $allow_mime_types, true ) ) ) {
+			$this->plugin->logger->debug( "File type ({$wp_filetype['type']}) is not allowed for upload." );
+
+			return null;
+		}
+
+		// Move the file to the uploads dir
+		if ( ! ini_get( 'allow_url_fopen' ) ) {
+			$file_data = $this->get_file_contents( $imageUrl );
+		} else {
+			$arrContextOptions = [
+				'ssl' => [
+					'verify_peer'      => false,
+					'verify_peer_name' => false,
+				],
+			];
+
+			$file_data = file_get_contents( $imageUrl, false, stream_context_create( $arrContextOptions ) );
+		}
+
+		if ( ! $file_data ) {
+			$this->plugin->logger->debug( "Failed to download the file from the link {$imageUrl}" );
+
+			return null;
+		}
+
+		file_put_contents( $new_file, $file_data );
+
+		$file_mime = mime_content_type( $new_file );
+
+		if ( ! in_array( $wp_filetype['type'], $allow_mime_types, true ) ) {
+			unlink( $new_file );
+
+			return null;
+		}
+
+		// Set correct file permissions
+		$stat  = stat( dirname( $new_file ) );
+		$perms = $stat['mode'] & 0000666;
+		@ chmod( $new_file, $perms );
+
+		// Compute the URL
+		$url = $uploads['url'] . "/$filename";
+
+		// Construct the attachment array
+		$attachment = [
+			'post_mime_type' => $file_mime,
+			'guid'           => $url,
+			'post_parent'    => null,
+			'post_title'     => $imageTitle,
+			'post_content'   => '',
+		];
+
+		$thumb_id = wp_insert_attachment( $attachment, $new_file, $post_id );
+		if ( ! is_wp_error( $thumb_id ) ) {
+			require_once ABSPATH . '/wp-admin/includes/image.php';
+
+			// Added fix by misthero as suggested
+			wp_update_attachment_metadata( $thumb_id, wp_generate_attachment_metadata( $thumb_id, $new_file ) );
+			update_attached_file( $thumb_id, $new_file );
+
+			return $thumb_id;
+		} else {
+			$this->plugin->logger->error( "Failed to add an attachment ({$new_file}) " . var_export( $attachment ) );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Function to fetch the contents of URL using HTTP API in absence of allow_url_fopen.
+	 */
+	public function get_file_contents( $URL ) {
+		$response = wp_remote_get( $URL );
+		$contents = '';
+		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
+			$contents = wp_remote_retrieve_body( $response );
+		}
+
+		return $contents ? $contents : false;
+	}
+
 	/**
 	 * Используется для динамической загрузки изображений поста в окно выбора
 	 *
@@ -816,125 +950,192 @@ class AutoPostThumbnails {
 	}
 
 	/**
-	 * AJAX загрузка выбранного изображения
+	 * AJAX Image Upload Handler - Modern WordPress Security
 	 */
 	public function upload_to_library() {
-
-		if ( ! wp_verify_nonce( $_POST['wpnonce'], 'apt_api' ) ) {
+		$nonce = isset( $_POST['wpnonce'] ) ? sanitize_text_field( wp_unslash( $_POST['wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'apt_api' ) ) {
 			die( 'Error: Invalid request.' );
 		}
-		if ( isset( $_POST['is_upload'] ) ) {
-			$postid = intval( $_POST['postid'] );
 
-			// get image file
-			$response = wp_remote_get( $_POST['image_url'], [ 'timeout' => 100 ] );
-			if ( is_wp_error( $response ) ) {
-				die( 'Error: ' . esc_html( $response->get_error_message() ) );
-			}
-
-			$file_ext    = '';
-			$image_title = '';
-			switch ( $_POST['service'] ) {
-				case 'pixabay':
-					$path_info   = pathinfo( esc_url_raw( $_POST['image_url'] ) );
-					$file_ext    = $path_info['extension'];
-					$image_title = sanitize_text_field( $_POST['q'] );
-					break;
-				case 'unsplash':
-					parse_str( parse_url( $_POST['image_url'], PHP_URL_QUERY ), $url_query );
-					$file_ext = $url_query['fm'];
-					if ( ! $file_ext ) {
-						$file_ext = 'jpg';
-					}
-
-					$image_title = sanitize_text_field( $_POST['title'] );
-					break;
-				case 'google':
-					$path_info = pathinfo( esc_url_raw( $_POST['image_url'] ) );
-					$file_ext  = $path_info['extension'];
-					if ( $file_ext !== 'jpg' && $file_ext !== 'jpeg' && $file_ext !== 'png' && $file_ext !== 'gif' ) {
-						$file_ext = 'jpg';
-					}
-					if ( empty( $file_ext ) ) {
-						$file_ext = 'jpg';
-					}
-					$image_title = sanitize_text_field( wp_unslash( $_POST['title'] ?? '' ) );
-					break;
-			}
-
-			if ( ! $this->is_allowed_file_ext( $file_ext ) ) {
-				die( 'Error: File extension is not allowed' );
-			}
-
-			$q                 = sanitize_text_field( wp_unslash( $_POST['q'] ?? '' ) );
-			$file_name         = sanitize_file_name( implode( '_', explode( ' ', $q ) ) . '_' . time() . '.' . $file_ext );
-			$wp_upload_dir     = wp_upload_dir();
-			$image_upload_path = $wp_upload_dir['path'];
-
-			if ( ! is_dir( $image_upload_path ) ) {
-				// phpcs:disable WordPress.PHP.NoSilencedErrors.Discouraged
-				if ( ! @mkdir( $image_upload_path, 0777, true ) ) {
-					die( 'Error: Failed to create upload folder ' . esc_html( $image_upload_path ) );
-				}
-				// phpcs:enable
-			}
-
-			global $wp_filesystem;
-			if ( ! $wp_filesystem ) {
-				if ( ! function_exists( 'WP_Filesystem' ) ) {
-					require_once ABSPATH . 'wp-admin/includes/file.php';
-				}
-				WP_Filesystem();
-			}
-
-			$target_file_name = $image_upload_path . '/' . $file_name;
-			$result           = $wp_filesystem->put_contents( $target_file_name, $response['body'] );
-			//$result           = @file_put_contents( $target_file_name, $response['body'] );
-			unset( $response['body'] );
-			if ( false === $result ) {
-				die( 'Error: Failed to write file ' . esc_html( $target_file_name ) );
-			}
-
-			// are we dealing with an image
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-			if ( ! wp_read_image_metadata( $target_file_name ) ) {
-				unlink( $target_file_name );
-				die( 'Error: File is not an image.' );
-			}
-
-			$attachment_caption = '';
-
-			// insert attachment
-			$wp_filetype = wp_check_filetype( basename( $target_file_name ), null );
-			$attachment  = [
-				'guid'           => $wp_upload_dir['url'] . '/' . basename( $target_file_name ),
-				'post_mime_type' => $wp_filetype['type'],
-				'post_title'     => preg_replace( '/\.[^.]+$/', '', $image_title ),
-				'post_status'    => 'inherit',
-			];
-
-			$attach_id = wp_insert_attachment( $attachment, $target_file_name, $postid );
-			if ( 0 === $attach_id ) {
-				die( 'Error: File attachment error' );
-			}
-
-			$attach_data = wp_generate_attachment_metadata( $attach_id, $target_file_name );
-			$result      = wp_update_attachment_metadata( $attach_id, $attach_data );
-			update_attached_file( $attach_id, $target_file_name );
-
-			if ( ! $result ) {
-				// die( 'Error: File attachment metadata error' );
-			}
-
-			$image_data                 = [];
-			$image_data['ID']           = $attach_id;
-			$image_data['post_excerpt'] = sanitize_text_field( wp_unslash( $_POST['excerpt'] ?? '' ) );
-			wp_update_post( $image_data );
-
-			echo (int) $attach_id;
-
-			exit;
+		// Check user capabilities
+		if ( ! current_user_can( 'upload_files' ) ) {
+			die( 'Error: You do not have permission to upload files.' );
 		}
+
+		$is_upload = isset( $_POST['is_upload'] ) ? absint( $_POST['is_upload'] ) : 0;
+		
+		if ( ! $is_upload ) {
+			return;
+		}
+
+		$postid = isset( $_POST['postid'] ) ? absint( $_POST['postid'] ) : 0;
+		if ( $postid && ! current_user_can( 'edit_post', $postid ) ) {
+			die( 'Error: You cannot attach media to this post.' );
+		}
+
+		$image_url = isset( $_POST['image_url'] ) ? wp_unslash( $_POST['image_url'] ) : '';
+		$image_url = wp_http_validate_url( $image_url );
+		
+		if ( ! $image_url ) {
+			die( 'Error: Invalid image URL.' );
+		}
+
+		// Require HTTPS for security
+		if ( 0 !== strpos( $image_url, 'https://' ) ) {
+			die( 'Error: Image URL must use HTTPS.' );
+		}
+
+		$image_url = esc_url_raw( $image_url );
+
+		$parsed_url = wp_parse_url( $image_url );
+		$host       = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
+
+		// Block private/internal IPs (SSRF secondary defense)
+		$ip = gethostbyname( $host );
+		if ( false === filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+			die( 'Error: Invalid image source.' );
+		}
+
+		$max_size = 10 * 1024 * 1024; // 10MB
+
+		// Pre-download check via Content-Length header
+		$headers_response = wp_remote_head( $image_url, array(
+			'timeout'     => 10,
+			'redirection' => 3,
+			'sslverify'   => true,
+		) );
+
+		if ( ! is_wp_error( $headers_response ) ) {
+			$content_length = wp_remote_retrieve_header( $headers_response, 'content-length' );
+			if ( $content_length && intval( $content_length ) > $max_size ) {
+				die( 'Error: Image file is too large.' );
+			}
+		}
+
+		$response = wp_remote_get( $image_url, array(
+			'timeout'     => 30,
+			'redirection' => 3,
+			'sslverify'   => true,
+		) );
+
+		if ( is_wp_error( $response ) ) {
+			die( 'Error: Failed to download image.' );
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $status_code ) {
+			die( 'Error: Server returned error.' );
+		}
+
+		$content_type = wp_remote_retrieve_header( $response, 'content-type' );
+		$content_type = explode( ';', $content_type );
+		$content_type = trim( $content_type[0] );
+
+		$allowed_types = get_allowed_mime_types();
+
+		if ( ! in_array( $content_type, $allowed_types, true ) ) {
+			die( 'Error: Invalid image type.' );
+		}
+
+		$response_body = wp_remote_retrieve_body( $response );
+		$actual_size = strlen( $response_body );
+
+		if ( $actual_size > $max_size || empty( $response_body ) ) {
+			die( 'Error: Image file is invalid.' );
+		}
+
+		$mime_to_ext = array(
+			'image/jpeg' => 'jpg',
+			'image/png'  => 'png',
+			'image/gif'  => 'gif',
+			'image/webp' => 'webp',
+		);
+
+		$file_ext = isset( $mime_to_ext[ $content_type ] ) ? $mime_to_ext[ $content_type ] : 'jpg';
+
+		if ( ! $this->is_allowed_file_ext( $file_ext ) ) {
+			die( 'Error: File extension not allowed.' );
+		}
+
+		$search_query = isset( $_POST['q'] ) ? wp_unslash( $_POST['q'] ) : '';
+		$file_name    = sanitize_file_name( trim( $search_query ) . '_' . time() . '.' . $file_ext );
+
+		if ( empty( $file_name ) || '.' === $file_name[0] ) {
+			$file_name = str_replace( '_', ' ', $search_query ) . '_' . time() . '.' . $file_ext;
+		}
+
+		$image_title = isset( $_POST['title'] ) ? wp_unslash( $_POST['title'] ) : '';
+		if ( ! $image_title ) {
+			$image_title = ! empty( $search_query ) ? $search_query : 'Imported Image';
+		}
+
+		$image_caption = isset( $_POST['excerpt'] ) ? sanitize_textarea_field( wp_unslash( $_POST['excerpt'] ) ) : '';
+
+		$upload = wp_upload_bits( $file_name, null, $response_body );
+
+		if ( $upload['error'] ) {
+			die( 'Error: Failed to upload file.' );
+		}
+
+		$target_file_path = $upload['file'];
+
+		$image_info = @getimagesize( $target_file_path );
+
+		if ( false === $image_info ) {
+			@unlink( $target_file_path );
+			die( 'Error: File is not a valid image.' );
+		}
+
+		$image_width  = $image_info[0];
+		$image_height = $image_info[1];
+
+		// Decompression bomb protection
+		$max_dimension = 10000;
+		if ( $image_width > $max_dimension || $image_height > $max_dimension ) {
+			@unlink( $target_file_path );
+			die( 'Error: Image dimensions are too large.' );
+		}
+
+		$wp_upload_dir = wp_upload_dir();
+		$file_url = $wp_upload_dir['url'] . '/' . basename( $target_file_path );
+
+		$attachment_data = array(
+			'guid'           => $file_url,
+			'post_mime_type' => $content_type,
+			'post_title'     => sanitize_text_field( $image_title ),
+			'post_excerpt'   => $image_caption,
+			'post_status'    => 'inherit',
+		);
+
+		$attachment_id = wp_insert_attachment( $attachment_data, $target_file_path, $postid );
+
+		if ( 0 === $attachment_id ) {
+			@unlink( $target_file_path );
+			die( 'Error: Failed to create attachment.' );
+		}
+
+		// Generate thumbnails and metadata
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$attachment_metadata = wp_generate_attachment_metadata( $attachment_id, $target_file_path );
+
+		if ( $attachment_metadata ) {
+			wp_update_attachment_metadata( $attachment_id, $attachment_metadata );
+		}
+
+		echo (int) $attachment_id;
+		exit;
+	}
+
+	/**
+	 * Check if file extension is allowed
+	 *
+	 * @param string $extension File extension
+	 * @return bool
+	 */
+	private function is_allowed_file_ext( $extension ) {
+		$allowed = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
+		return in_array( strtolower( $extension ), $allowed, true );
 	}
 
 	/**
@@ -1372,21 +1573,5 @@ class AutoPostThumbnails {
 		}
 
 		return new WP_Error( 'apt_attachment', 'File not exists (insert_attachment)' );
-	}
-
-	/**
-	 * @param $file_ext
-	 *
-	 * @return bool
-	 */
-	public function is_allowed_file_ext( $file_ext ) {
-		$mimes = get_allowed_mime_types();
-		foreach ( $mimes as $type => $mime ) {
-			if ( strpos( $type, $file_ext ) !== false ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

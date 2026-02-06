@@ -33,16 +33,6 @@ class WAPT_ComponentsPage extends \WBCR\Factory_Templates_134\Pages\Components {
 		$base_path_prefix = defined( 'BUILD_TYPE' ) ? 'wp-plugin-' : '';
 
 		$components = array_merge($components, [
-			[
-				'name' => 'ai_image_generator',
-				'title' => __('Ai image generator', 'apt'),
-				'url' => 'https://wordpress.org/plugins/ai-image-generator/',
-				'type' => 'wordpress',
-				'build' => 'freemium',
-				'base_path' => $base_path_prefix . 'ai-image-gen/ai-image-gen.php',
-				'icon' =>  WAPT_PLUGIN_URL . '/admin/assets/img/aig-icon-128x128.png',
-				'description' => __('Automatically generates article thumbnails from text, using all the features of the Chatgpt and Dalle neural networks.', 'clearfy')
-			],
 
 			[
 				'name' => 'robin_image_optimizer',

@@ -417,7 +417,7 @@
 				   target="_blank" rel="noopener">F.A.Q.</a>
 			</p>
 			<p>
-				<a href="https://forum.webcraftic.com/" target="_blank" rel="noopener">Get starting free support</a>
+				<a href="https://wordpress.org/support/plugin/auto-post-thumbnail/" target="_blank" rel="noopener">Get starting free support</a>
 			</p>
 		</div>
 	</div>

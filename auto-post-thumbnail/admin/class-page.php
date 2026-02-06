@@ -71,6 +71,25 @@ class WAPT_Page extends WBCR\Factory_Templates_134\Pages\PageBase {
 
 	// todo: For compatibility with the old version of the premium plugin
 	public static function group_header() {}
+
+	/**
+	 * Get all post types
+	 *
+	 * @return array[]
+	 */
+	public function getPostTypes() {
+		$post_types = get_post_types( [ 'public' => true ], 'objects' );
+
+		unset( $post_types['attachment'] );
+
+		foreach ( $post_types as $key => $post_type ) {
+			if ( ! post_type_supports( $key, 'thumbnail' ) ) {
+				unset( $post_types[ $key ] );
+			}
+		}
+		
+		return array_map( function ( $post_type ) {
+			return [ $post_type->name, $post_type->label ];
+		}, $post_types );
+	}
 }
-
-
