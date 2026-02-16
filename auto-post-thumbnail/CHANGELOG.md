@@ -1,3 +1,7 @@
+#####   Version 5.0.1 (2026-02-16)
+
+- Fixes issue with missing plugin admin scripts
+
 ####   Version 5.0.0 (2026-02-16)
 
 ### New Features

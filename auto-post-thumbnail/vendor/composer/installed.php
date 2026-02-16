@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'codeinwp/auto-post-thumbnail',
-        'pretty_version' => 'v5.0.0',
-        'version' => '5.0.0.0',
-        'reference' => 'e2e14fbff5cd769767094472c7ac782dc262eb7f',
+        'pretty_version' => 'v5.0.1',
+        'version' => '5.0.1.0',
+        'reference' => '268c2f23008e7da0de9adeec0a086a5ab914855d',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'codeinwp/auto-post-thumbnail' => array(
-            'pretty_version' => 'v5.0.0',
-            'version' => '5.0.0.0',
-            'reference' => 'e2e14fbff5cd769767094472c7ac782dc262eb7f',
+            'pretty_version' => 'v5.0.1',
+            'version' => '5.0.1.0',
+            'reference' => '268c2f23008e7da0de9adeec0a086a5ab914855d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
