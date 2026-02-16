@@ -6,4 +6,6 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AutoPostThumbnail\\' => array($baseDir . '/src'),
+    'AutoPostThumbnailPro\\' => array($baseDir . '/pro'),
 );

@@ -4,15 +4,15 @@ Tags: post thumbnails, featured image, elementor, thumbnails, featured image fro
 Requires at least: 5.6
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 4.2.2
+Stable tag: 5.0.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Automatically generate the Featured Image from the first image in post or any custom post type only if Featured Image is not set manually. Featured Image Generation From Title. Native image search for Elementor, Gutenberg, Classic Editor.
+Automatically sets the Featured Image from the first image in a post — for any post type. Generate images from post titles or search for images natively in Elementor, Gutenberg, and Classic Editor.
 
 == Description ==
 
-Automatically generate the Featured Image from the first image in post or any custom post type only if Featured Image is not set manually. Featured Image Generation From Title. Native image search for Elementor, Gutenberg, Classic Editor.
+Automatically sets the Featured Image from the first image in a post — for any post type. Generate images from post titles or search for images natively in Elementor, Gutenberg, and Classic Editor.
 
 CREATE A FEATURED IMAGE IN 5 SECONDS
 1. Generate or remove featured images in one click.
@@ -49,7 +49,7 @@ It’s good to have an image in every post and page that you create. It helps fo
 This features of APT simplifies the process of publishing content and saves you money. It will automatically create a customized image for each post or page that you write. You can select a background image to match the look and feel of your blog, and the plugin will automatically write the title (or other text of your choosing) of a new or updated post or page on top of this background image to create a unique featured image for each post.
 
 
-#### AFI [PRO](https://cm-wp.com/apt/) ####
+#### AFI [PRO](https://themeisle.com/plugins/auto-featured-image/upgrade) ####
 1. Filters to generate or remove featured images based on the post type, status, category, or the creation date
 2. Generate or remove featured images from the list of posts or pages
 3. Featured Image Generation From Title.
@@ -60,7 +60,7 @@ This features of APT simplifies the process of publishing content and saves you 
 8. Images are recommended by the NEURAL NETWORK.
 9. Import all images from the post text to the media library.
 
-[learn more](https://cm-wp.com/apt/).
+[learn more](https://themeisle.com/plugins/auto-featured-image/upgrade).
 
 == What’s Next ==
 
@@ -87,7 +87,7 @@ TRANSLATIONS:
 </ul>
 <p>We are very need for your help with <a href="https://translate.wordpress.org/projects/wp-plugins/auto-post-thumbnail//" rel="nofollow ugc">translating the
 Auto Featured Image plugin</a> into your native language. We want to make it international and understandable for everyone. Please contact us via email inside the plugin, or create a topic on our <a href="https://wordpress.org/support/plugin/auto-post-thumbnail/">support forum</a> if you can help with the translations. In exchange for your help, we will give you better support and our premium plugins absolutely free!</p>
-https://cm-wp.com/apt/
+https://themeisle.com/plugins/auto-featured-image
 
 == Installation ==
 
@@ -229,14 +229,14 @@ Your existing setup will continue to work as usual — no action is required on 
 
 = 3.8.1 =
 * Fixed: Adding images to the post text.
-* Add: Import all images from the post text to the media library. [(PRO)](https://cm-wp.com/apt/)
+* Add: Import all images from the post text to the media library. [(PRO)](https://themeisle.com/plugins/auto-featured-image/upgrade)
 * Other minor fixes
 
 = 3.8.0 =
 * Fixed: Encoding issues (On the generated image, the title displayed html entities instead of characters.).
 * Added: New option in the image settings: dimensions of the generated image
 * Other minor fixes
-* Added: NEW OPTION: Search for an image by title of the post in Google [(PRO)](https://cm-wp.com/apt/)
+* Added: NEW OPTION: Search for an image by title of the post in Google [(PRO)](https://themeisle.com/plugins/auto-featured-image/upgrade)
 
 = 3.7.7 =
 * Fixed: Encoding issues. [Solution](https://wordpress.org/support/topic/not-working-with-cyrillic-titles) by @bibliata

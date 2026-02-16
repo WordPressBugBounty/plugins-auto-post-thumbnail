@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'codeinwp/auto-post-thumbnail',
-        'pretty_version' => 'v4.2.2',
-        'version' => '4.2.2.0',
-        'reference' => '981ce2a3f243c613b05b7f884b16ed1b27108e8d',
+        'pretty_version' => 'v5.0.0',
+        'version' => '5.0.0.0',
+        'reference' => 'e2e14fbff5cd769767094472c7ac782dc262eb7f',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'codeinwp/auto-post-thumbnail' => array(
-            'pretty_version' => 'v4.2.2',
-            'version' => '4.2.2.0',
-            'reference' => '981ce2a3f243c613b05b7f884b16ed1b27108e8d',
+            'pretty_version' => 'v5.0.0',
+            'version' => '5.0.0.0',
+            'reference' => 'e2e14fbff5cd769767094472c7ac782dc262eb7f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -25,6 +25,15 @@
             'reference' => '605f78bbbd8526f7597a89077791043d9ecc8c20',
             'type' => 'library',
             'install_path' => __DIR__ . '/../codeinwp/themeisle-sdk',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'woocommerce/action-scheduler' => array(
+            'pretty_version' => '3.9.3',
+            'version' => '3.9.3.0',
+            'reference' => 'c58cdbab17651303d406cd3b22cf9d75c71c986c',
+            'type' => 'wordpress-plugin',
+            'install_path' => __DIR__ . '/../woocommerce/action-scheduler',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
