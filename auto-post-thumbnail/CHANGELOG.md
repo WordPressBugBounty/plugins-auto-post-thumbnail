@@ -1,3 +1,8 @@
+#####   Version 5.0.2 (2026-02-17)
+
+- Fix PHP 7.4 comaptibility
+- Fix edge case when using some PNG images as background caused the text to inherit the same color as the predominant one in the image
+
 #####   Version 5.0.1 (2026-02-16)
 
 - Fixes issue with missing plugin admin scripts

@@ -351,8 +351,24 @@ class Image {
 		$pad_left = (int) $this->padding_left;
 		$pad_top  = (int) $this->padding_top;
 
+		// Convert palette-based images to truecolor to ensure accurate color allocation
+		// Note: imagepalettetotruecolor modifies the image in place and returns bool
+		if ( false !== $this->image && function_exists( 'imageistruecolor' ) && function_exists( 'imagepalettetotruecolor' ) && ! imageistruecolor( $this->image ) ) {
+			$conversion_success = imagepalettetotruecolor( $this->image );
+			if ( $conversion_success ) {
+				// Preserve alpha channel support for PNG images
+				if ( function_exists( 'imagesavealpha' ) ) {
+					imagesavealpha( $this->image, true );
+				}
+				if ( function_exists( 'imagealphablending' ) ) {
+					imagealphablending( $this->image, true );
+				}
+			}
+		}
+
 		$color      = $this->color_hex_to_rgb( $font_color );
 		$font_color = imagecolorallocate( $this->image, $color['r'], $color['g'], $color['b'] );
+
 		if ( ! empty( $shadow_color ) ) {
 			$color        = $this->color_hex_to_rgb( $shadow_color );
 			$shadow_color = imagecolorallocate( $this->image, $color['r'], $color['g'], $color['b'] );

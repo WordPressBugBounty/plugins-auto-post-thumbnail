@@ -19,7 +19,7 @@ class IO {
 	 * @return void
 	 */
 	public function on_activate() {
-		do_action( hook_name: 'wapt/plugin_activated' );
+		do_action( 'wapt/plugin_activated' );
 	}
 
 	/**
@@ -34,6 +34,6 @@ class IO {
 			Settings::instance()->delete_all();
 		}
 
-		do_action( hook_name: 'wapt/plugin_deactivated' );
+		do_action( 'wapt/plugin_deactivated' );
 	}
 }

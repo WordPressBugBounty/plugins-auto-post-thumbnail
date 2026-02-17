@@ -99,7 +99,7 @@ class Settings {
 	 * @return array <string, mixed>
 	 */
 	public function get_all_public() {
-		$schema  = Options_Schema::get( null, include_private: false );
+		$schema  = Options_Schema::get( null, false );
 		$options = [];
 		foreach ( $schema as $key => $value ) {
 			$options[ $key ] = $this->get( $key );
@@ -113,7 +113,7 @@ class Settings {
 	 * @return array <string, mixed>
 	 */
 	public function get_all() {
-		$schema  = Options_Schema::get( null, include_private: true );
+		$schema  = Options_Schema::get( null, true );
 		$options = [];
 		foreach ( $schema as $key => $value ) {
 			$options[ $key ] = $this->get( $key );
@@ -127,7 +127,7 @@ class Settings {
 	 * @return array <string, mixed>
 	 */
 	public function get_tracked() {
-		$schema  = Options_Schema::get( null, include_private: true );
+		$schema  = Options_Schema::get( null, true );
 		$tracked = array_filter(
 			$schema,
 			function ( $value ) {
@@ -150,7 +150,7 @@ class Settings {
 	 * @return void
 	 */
 	public function delete_all() {
-		$schema = Options_Schema::get( null, include_private: true );
+		$schema = Options_Schema::get( null, true );
 		foreach ( $schema as $key => $value ) {
 			delete_option( sprintf( '%s_%s', self::OPTION_PREFIX, $key ) );
 		}
