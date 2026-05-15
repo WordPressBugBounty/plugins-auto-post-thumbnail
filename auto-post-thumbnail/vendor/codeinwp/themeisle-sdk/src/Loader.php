@@ -64,6 +64,7 @@ final class Loader {
 		'announcements',
 		'featured_plugins',
 		'float_widget',
+		'migrator',
 	];
 	/**
 	 * Holds the labels for the modules.
@@ -72,10 +73,11 @@ final class Loader {
 	 */
 	public static $labels = [
 		'announcements'    => [
-			'notice_link_label' => 'See the Offer',
-			'max_savings'       => 'Our biggest sale of the year: <strong>%s OFF everything!</strong>  Don\'t miss this limited-time offer.',
-			'black_friday'      => 'Black Friday Sale',
-			'time_left'         => '%s left',
+			'notice_link_label'   => 'See the deals',
+			'max_savings'         => 'Best WordPress Black Friday deals of %s — themes, plugins, hosting. Curated by the Themeisle team.',
+			'black_friday'        => 'Black Friday Sale',
+			'time_left'           => '%s left',
+			'plugin_meta_message' => 'Black Friday Sale - 60% OFF',
 		],
 		'compatibilities'  => [
 			'notice'        => '%s requires a newer version of %s. Please %supdate%s %s %s to the latest version.',
@@ -108,10 +110,14 @@ final class Loader {
 			'valid'               => 'Valid',
 			'invalid'             => 'Invalid',
 			'notice'              => 'Enter your license from %s purchase history in order to get %s updates',
-			'expired'             => 'Your %s\'s License Key has expired. In order to continue receiving support and software updates you must  %srenew%s your license key.',
+			'expired'             => '%s license expired',
+			'expired_date'        => 'Expired on %s',
+			'expired_notice'      => 'Your current setup continues working, but premium features are disabled and you\'re no longer receive updates - including critical patches - or support.',
 
 			'inactive'            => 'In order to benefit from updates and support for %s, please add your license code from your  %spurchase history%s and validate it %shere%s.',
 			'no_activations'      => 'No more activations left for %s. You need to upgrade your plan in order to use %s on more websites. If you need assistance, please get in touch with %s staff.',
+			'renew_license'       => 'Renew License',
+			'learn_more'          => 'Learn More',
 		],
 		'promotions'       => [
 			'recommended'     => 'Recommended by %s',
@@ -249,9 +255,9 @@ final class Loader {
 			'cta' => 'Rollback to v%s',
 		],
 		'logger'           => [
-			'notice' => 'Do you enjoy <b>{product}</b>? Become a contributor by opting in to our anonymous data tracking. We guarantee no sensitive data is collected.',
-			'cta_y'  => 'Sure, I would love to help.',
-			'cta_n'  => 'No, thanks.',
+			'notice' => 'Help improve <b>{product}</b> by sharing anonymous usage data about your setup. No personal data collected.',
+			'cta_y'  => 'Count me in',
+			'cta_n'  => 'No thanks',
 		],
 		'about_us'         => [
 			'title'            => 'About Us',
@@ -331,10 +337,7 @@ final class Loader {
 	 * Initialize the sdk logic.
 	 */
 	public static function init() {
-		/**
-		 * This filter can be used to localize the labels inside each product.
-		 */
-		self::$labels = apply_filters( 'themeisle_sdk_labels', self::$labels );
+		self::localize_labels();
 		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof Loader ) ) {
 			self::$instance = new Loader();
 			$modules        = array_merge( self::$available_modules, apply_filters( 'themeisle_sdk_modules', [] ) );
@@ -346,7 +349,89 @@ final class Loader {
 			self::$available_modules = $modules;
 
 			add_action( 'themeisle_sdk_first_activation', array( __CLASS__, 'activate' ) );
+		
 		}
+	}
+	
+	/**
+	 * Localize the labels.
+	 */
+	public static function localize_labels() {
+		$originals        = self::$labels;
+		$all_translations = [];
+
+		global $wp_filter;
+		if ( isset( $wp_filter['themeisle_sdk_labels'] ) ) {
+			foreach ( $wp_filter['themeisle_sdk_labels']->callbacks as $priority => $hooks ) {
+				foreach ( $hooks as $hook ) {
+					// Each callback gets fresh originals, not previous callback's output
+					$result             = call_user_func( $hook['function'], $originals );
+					$all_translations[] = $result;
+				}
+			}
+			
+			// Remove the filter so it doesn't run again via apply_filters
+			remove_all_filters( 'themeisle_sdk_labels' );
+		}
+
+		// Merge all results, first real translation wins
+		self::$labels = self::merge_all_translations( $originals, $all_translations );
+	}
+	/**
+	 * Merge all translations.
+	 *
+	 * @param array $originals The original labels.
+	 * @param array $all_translations The all translations.
+	 *
+	 * @return array The merged labels.
+	 */
+	private static function merge_all_translations( $originals, $all_translations ) {
+		$result = $originals;
+		
+		foreach ( $all_translations as $translations ) {
+			$result = self::merge_if_translated( $result, $translations, $originals );
+		}
+		
+		return $result;
+	}
+	/**
+	 * Merge if translated.
+	 *
+	 * @param array $current The current labels.
+	 * @param array $new The new labels.
+	 * @param array $originals The original labels.
+	 * @return array The merged labels.
+	 */
+	private static function merge_if_translated( $current, $new, $originals ) {
+		foreach ( $new as $key => $value ) {
+			if ( ! isset( $originals[ $key ] ) ) {
+				// New key, accept it
+				if ( ! isset( $current[ $key ] ) ) {
+					$current[ $key ] = $value;
+				}
+				continue;
+			}
+			
+			if ( is_array( $value ) && is_array( $originals[ $key ] ) ) {
+				$current[ $key ] = self::merge_if_translated( 
+					$current[ $key ], 
+					$value, 
+					$originals[ $key ] 
+				);
+			} else {
+				// Only accept if:
+				// 1. New value is actually translated (differs from original)
+				// 2. Current value is NOT already translated
+				$is_new_translated       = ( $value !== $originals[ $key ] );
+				$is_current_untranslated = ( $current[ $key ] === $originals[ $key ] );
+				
+				if ( $is_new_translated && $is_current_untranslated ) {
+					$current[ $key ] = $value;
+				}
+			}
+		}
+		
+		return $current;
 	}
 
 	/**

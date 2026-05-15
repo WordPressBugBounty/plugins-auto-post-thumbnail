@@ -1,3 +1,8 @@
+#####   Version 5.0.3 (2026-05-15)
+
+- Improved compatibility with Woody plugin
+- Updated dependencies
+
 #####   Version 5.0.2 (2026-02-17)
 
 - Fix PHP 7.4 comaptibility

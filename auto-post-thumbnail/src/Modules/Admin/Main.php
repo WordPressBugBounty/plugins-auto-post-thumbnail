@@ -42,6 +42,9 @@ class Main extends Base {
 
 		// Survey.
 		add_filter( 'themeisle-sdk/survey/' . WAPT_PRODUCT_SLUG, [ $this, 'get_survey_metadata' ], 10, 2 );
+
+		// Black friday data.
+		add_filter( 'themeisle_sdk_blackfriday_data', [ $this, 'add_black_friday_data' ] );
 	}
 
 	/**
@@ -329,5 +332,71 @@ class Main extends Base {
 		$data['settings'] = $settings;
 
 		return $data;
+	}
+
+	/**
+	 * Set the black friday data.
+	 *
+	 * @param array<string, mixed> $configs The configuration array for the loaded products.
+	 *
+	 * @return array<string, mixed> The configurations.
+	 */
+	public function add_black_friday_data( $configs ) {
+		$config = $configs['default'];
+
+		$message   = __( 'Unsplash & Pixabay integration, scheduled generation, bulk processing. Automate your featured images properly. Exclusively for existing users.', 'auto-post-thumbnail' );
+		$cta_label = __( 'Get Pro', 'auto-post-thumbnail' );
+
+		$plan             = apply_filters( 'product_apt_license_plan', 0 );
+		$license          = apply_filters( 'product_apt_license_key', false );
+		$status           = apply_filters( 'product_apt_license_status', false );
+		$pro_product_slug = defined( 'WAPTP_PLUGIN_SLUG' ) ? WAPTP_PLUGIN_SLUG : '';
+
+		$is_pro     = 'valid' === $status;
+		$is_expired = 'expired' === $status || 'active-expired' === $status;
+
+		if ( $is_pro ) {
+			// translators: %s is the discount percentage.
+			$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'auto-post-thumbnail' ), '30%' );
+			// translators: %1$s - discount, %2$s - discount.
+			$message   = sprintf( __( 'Upgrade your Auto Feature Image Pro plan: %1$s off this week. Already on the plan you need? Renew early and save up to %2$s.', 'auto-post-thumbnail' ), '30%', '20%' );
+			$cta_label = __( 'See your options', 'auto-post-thumbnail' );
+		} elseif ( $is_expired ) {
+			// translators: %s is the discount percentage.
+			$config['upgrade_menu_text'] = sprintf( __( 'BF Sale - %s off', 'auto-post-thumbnail' ), '50%' );
+			// translators: %s is the discount percentage.
+			$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - up to %s off', 'auto-post-thumbnail' ), '50%' );
+			$message                       = __( 'Your Pro features are still here, just locked. Renew at a reduced rate this week.', 'auto-post-thumbnail' );
+			$cta_label                     = __( 'Reactivate now', 'auto-post-thumbnail' );
+		} else {
+			// translators: %s - discount.
+			$config['title'] = sprintf( __( 'Auto Featured Image Pro: %s off this week', 'auto-post-thumbnail' ), '60%' );
+			// translators: %s is the discount percentage.
+			$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'auto-post-thumbnail' ), '60%' );
+			// translators: %s is the discount percentage.
+			$config['upgrade_menu_text'] = sprintf( __( 'BF Sale - %s off', 'auto-post-thumbnail' ), '60%' );
+		}
+
+		$url_params = [
+			'utm_term' => $is_pro ? 'plan-' . $plan : 'free',
+			'lkey'     => ! empty( $license ) ? $license : false,
+			'expired'  => $is_expired ? '1' : false,
+		];
+
+		if ( $is_pro || $is_expired ) {
+			$config['plugin_meta_targets'] = [ $pro_product_slug ];
+		}
+
+		$config['cta_label'] = $cta_label;
+		$config['message']   = $message;
+
+		$config['sale_url'] = add_query_arg(
+			$url_params,
+			tsdk_translate_link( tsdk_utmify( 'https://themeisle.link/apt-bf', 'bfcm', 'auto-featured-image' ) )
+		);
+
+		$configs[ WAPT_PRODUCT_SLUG ] = $config;
+
+		return $configs;
 	}
 }

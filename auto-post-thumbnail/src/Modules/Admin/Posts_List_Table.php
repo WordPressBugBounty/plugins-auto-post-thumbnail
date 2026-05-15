@@ -73,12 +73,10 @@ class Posts_List_Table extends Base {
 	/**
 	 * Enqueue assets.
 	 *
-	 * @param string $hook_suffix The current admin page hook suffix.
-	 *
 	 * @return void
 	 */
-	public function legacy_enqueue_assets( $hook_suffix ) {
-		if ( 'edit.php' !== $hook_suffix ) {
+	public function legacy_enqueue_assets() {
+		if ( 'post' !== get_post_type() ) {
 			return;
 		}
 
