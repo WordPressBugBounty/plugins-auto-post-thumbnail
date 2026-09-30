@@ -334,21 +334,46 @@ class Apt {
 
 		$image_title = $title;
 
+		$mime_extensions = [
+			'image/jpeg' => 'jpg',
+			'image/png'  => 'png',
+			'image/gif'  => 'gif',
+			'image/bmp'  => 'bmp',
+			'image/tiff' => 'tif',
+			'image/webp' => 'webp',
+			'image/avif' => 'avif',
+		];
+
+		$allow_mime_types = array_keys( $mime_extensions );
+
 		// Get the file name — use slug + hash for video thumbnails (matching generated images),
 		// fall back to extracting from URL.
 		if ( ! empty( $image_title ) ) {
 			$url_path = wp_parse_url( $image_url, PHP_URL_PATH );
 			$ext      = $url_path ? pathinfo( $url_path, PATHINFO_EXTENSION ) : '';
-			$ext      = $ext ? $ext : 'jpg';
 			$slug     = sanitize_file_name( $image_title );
 			$hash     = substr( md5( time() . $image_title ), 0, 5 );
-			$filename = "{$slug}_{$post_id}_{$hash}.{$ext}";
+			$name     = "{$slug}_{$post_id}_{$hash}";
 		} else {
-			$filename = substr( $image_url, ( strrpos( $image_url, '/' ) ) + 1 );
+			$basename = substr( $image_url, ( strrpos( $image_url, '/' ) ) + 1 );
 			// Exclude parameters after the filename.
-			if ( strrpos( $filename, '?' ) ) {
-				$filename = substr( $filename, 0, strrpos( $filename, '?' ) );
+			if ( strrpos( $basename, '?' ) ) {
+				$basename = substr( $basename, 0, strrpos( $basename, '?' ) );
 			}
+			$ext  = pathinfo( $basename, PATHINFO_EXTENSION );
+			$name = pathinfo( $basename, PATHINFO_FILENAME );
+		}
+
+		// Empty or unknown suffix (e.g. a timestamp): resolved from the downloaded content.
+		$wp_filetype = $ext ? wp_check_filetype( "{$name}.{$ext}" ) : [
+			'ext'  => false,
+			'type' => false,
+		];
+
+		if ( $wp_filetype['type'] && ! in_array( $wp_filetype['type'], $allow_mime_types, true ) ) {
+			Logger::instance()->debug( "File type ({$wp_filetype['type']}) is not allowed for upload." );
+
+			return null;
 		}
 
 		$uploads = wp_upload_dir( current_time( 'mysql' ) );
@@ -356,36 +381,6 @@ class Apt {
 			return null;
 		}
 
-		// Generate unique file name
-		$filename = wp_unique_filename( $uploads['path'], $filename );
-
-		$new_file = $uploads['path'] . "/$filename";
-		$ext      = pathinfo( $new_file, PATHINFO_EXTENSION );
-		if ( empty( $ext ) ) {
-			$ext       = 'jpg';
-			$filename .= ".{$ext}";
-			$new_file .= ".{$ext}";
-		}
-
-		$wp_filetype = wp_check_filetype( $filename );
-
-		$allow_mime_types = [
-			'image/jpeg',
-			'image/png',
-			'image/gif',
-			'image/bmp',
-			'image/tiff',
-			'image/webp',
-			'image/avif',
-		];
-
-		if ( ( ! $wp_filetype['ext'] || ! in_array( $wp_filetype['type'], $allow_mime_types, true ) ) ) {
-			Logger::instance()->debug( "File type ({$wp_filetype['type']}) is not allowed for upload." );
-
-			return null;
-		}
-
-		// Move the file to the uploads dir.
 		$file_data = $this->get_file_contents( $image_url );
 
 		if ( ! $file_data ) {
@@ -394,18 +389,58 @@ class Apt {
 			return null;
 		}
 
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+
+		// Temp file in uploads, so the move stays on one filesystem.
+		$tmp_file = wp_tempnam( $name, trailingslashit( $uploads['path'] ) );
+
 		// @phpcs:disable
-		file_put_contents( $new_file, $file_data );
+		$written = file_put_contents( $tmp_file, $file_data );
 		// @phpcs:enable
 
-		$file_mime = mime_content_type( $new_file );
+		if ( ! $written ) {
+			wp_delete_file( $tmp_file );
+
+			Logger::instance()->error( "Failed to write the downloaded file to {$tmp_file}" );
+
+			return null;
+		}
+
+		$file_mime = mime_content_type( $tmp_file );
 
 		if ( ! $file_mime || ! in_array( $file_mime, $allow_mime_types, true ) ) {
 			Logger::instance()->debug( "Downloaded file from {$image_url} is not a valid image (detected MIME: {$file_mime})." );
 
 			// @phpcs:disable
-			@unlink( $new_file );
+			@unlink( $tmp_file );
 			// @phpcs:enable
+
+			return null;
+		}
+
+		// No usable URL extension: name the file after its detected type.
+		$ext = $wp_filetype['ext'] ? $wp_filetype['ext'] : $mime_extensions[ $file_mime ];
+
+		// Generate unique file name
+		$filename = wp_unique_filename( $uploads['path'], sanitize_file_name( "{$name}.{$ext}" ) );
+		$new_file = $uploads['path'] . "/$filename";
+
+		// Local move: the temp file was written with local PHP calls, not via FS_METHOD.
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+		// Needed by the copy fallback; defined as in WP_Filesystem().
+		if ( ! defined( 'FS_CHMOD_FILE' ) ) {
+			define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
+		}
+
+		$filesystem = new \WP_Filesystem_Direct( null );
+		$moved      = $filesystem->move( $tmp_file, $new_file, true );
+
+		if ( ! $moved ) {
+			wp_delete_file( $tmp_file );
+
+			Logger::instance()->error( "Failed to move the downloaded file to {$new_file}" );
 
 			return null;
 		}

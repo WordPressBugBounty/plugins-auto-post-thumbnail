@@ -8,6 +8,7 @@
 namespace AutoPostThumbnail;
 
 use AutoPostThumbnail\Modules\Base;
+use AutoPostThumbnail\Modules\Abilities;
 use AutoPostThumbnail\Modules\Api;
 use AutoPostThumbnail\Modules\Options;
 use AutoPostThumbnail\Modules\Admin\Main as Admin_Main;
@@ -31,6 +32,7 @@ class Loader {
 		'admin'                  => Admin_Main::class,
 		'admin_posts_list_table' => Admin_Posts_List_Table::class,
 		'auto_generate'          => Auto_Generate::class,
+		'abilities'              => Abilities::class,
 	];
 
 	/**

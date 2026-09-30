@@ -4,7 +4,7 @@ Tags: post thumbnails, featured image, auto featured image, thumbnails, featured
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.0.6
+Stable tag: 5.0.7
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -189,10 +189,11 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-#####   Version 5.0.6 (2026-09-07)
+#####   Version 5.0.7 (2026-09-30)
 
-- Fixed duplicate Media Library images from post images without attachment classes.
-- Fixed the notice for incompatible legacy Premium versions.
+- Fixed remote image imports when URLs have timestamp suffixes.
+- Updated dependencies
+- Added AI agent support: let AI assistants read and change your Auto Featured Image settings and generate featured images.
 
 
 

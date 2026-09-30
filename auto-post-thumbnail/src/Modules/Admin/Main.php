@@ -37,6 +37,12 @@ class Main extends Base {
 			[ $this, 'get_about_us_metadata' ]
 		);
 
+		// AI Connect.
+		add_filter(
+			Loader::get_product_key() . '_ai_connect_metadata',
+			[ $this, 'get_ai_connect_metadata' ]
+		);
+
 		// Logger data.
 		add_filter( Loader::get_product_key() . '_logger_data', [ $this, 'get_logger_data' ] );
 
@@ -277,6 +283,28 @@ class Main extends Base {
 			'has_upgrade_menu' => ! defined( 'WAPT_PRO_PATH' ),
 			'upgrade_link'     => Helpers::get_upsell_url( 'aboutfilter' ),
 			'upgrade_text'     => __( 'Upgrade to Pro', 'auto-post-thumbnail' ),
+		];
+	}
+
+	/**
+	 * Get AI Connect metadata.
+	 *
+	 * @return array
+	 */
+	public function get_ai_connect_metadata() {
+		return [
+			'name'           => 'Auto Featured Image',
+			'notice_cases'   => [
+				__( 'set featured images from post content', 'auto-post-thumbnail' ),
+				__( 'generate featured images from post titles', 'auto-post-thumbnail' ),
+				__( 'fill in missing featured images in bulk', 'auto-post-thumbnail' ),
+			],
+			'prompts'        => [
+				__( 'Add a featured image to every published post that is missing one.', 'auto-post-thumbnail' ),
+				__( 'Set the featured image of my latest post from the first image in its content.', 'auto-post-thumbnail' ),
+				__( 'Generate featured images from the title for every News post that has no image in its content.', 'auto-post-thumbnail' ),
+			],
+			'ability_prefix' => 'featured-image',
 		];
 	}
 

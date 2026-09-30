@@ -1,3 +1,9 @@
+#####   Version 5.0.7 (2026-09-30)
+
+- Fixed remote image imports when URLs have timestamp suffixes.
+- Updated dependencies
+- Added AI agent support: let AI assistants read and change your Auto Featured Image settings and generate featured images.
+
 #####   Version 5.0.6 (2026-09-07)
 
 - Fixed duplicate Media Library images from post images without attachment classes.
