@@ -1,3 +1,9 @@
+#####   Version 5.0.8 (2026-10-22)
+
+- Fixed featured image generation on servers without image type detection.
+- Fixed post publishing failing without the mbstring PHP extension.
+- Updated dependencies
+
 #####   Version 5.0.7 (2026-09-30)
 
 - Fixed remote image imports when URLs have timestamp suffixes.

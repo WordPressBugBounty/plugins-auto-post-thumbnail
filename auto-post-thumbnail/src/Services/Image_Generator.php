@@ -353,9 +353,9 @@ class Image_Generator {
 	private function transform_text( $text, $transform ) {
 		switch ( $transform ) {
 			case 'upper':
-				return mb_strtoupper( $text );
+				return function_exists( 'mb_strtoupper' ) ? mb_strtoupper( $text ) : strtoupper( $text );
 			case 'lower':
-				return mb_strtolower( $text );
+				return function_exists( 'mb_strtolower' ) ? mb_strtolower( $text ) : strtolower( $text );
 			default:
 				return $text;
 		}

@@ -406,7 +406,7 @@ class Apt {
 			return null;
 		}
 
-		$file_mime = mime_content_type( $tmp_file );
+		$file_mime = $this->get_image_mime( $tmp_file, $file_data );
 
 		if ( ! $file_mime || ! in_array( $file_mime, $allow_mime_types, true ) ) {
 			Logger::instance()->debug( "Downloaded file from {$image_url} is not a valid image (detected MIME: {$file_mime})." );
@@ -656,6 +656,57 @@ class Apt {
 		}
 
 		return new WP_Error( 'apt_attachment', 'File not exists (insert_attachment)' );
+	}
+
+	/**
+	 * Get the real MIME type of an image file, without relying on Fileinfo.
+	 *
+	 * @param string $file      Path to the file.
+	 * @param string $file_data File contents, for the signature fallback.
+	 *
+	 * @return string|null
+	 */
+	private function get_image_mime( string $file, string $file_data ): ?string {
+		// Core may call a disabled finfo_open() on unknown ftyp data.
+		try {
+			$mime = wp_get_image_mime( $file );
+		} catch ( \Throwable $e ) {
+			Logger::instance()->warning( "wp_get_image_mime() failed for {$file}: {$e->getMessage()}" );
+
+			$mime = false;
+		}
+
+		if ( $mime ) {
+			return $mime;
+		}
+
+		// Fallback for WP < 5.8 (WebP) and WP < 6.5 (AVIF).
+		return $this->get_signature_mime( $file_data );
+	}
+
+	/**
+	 * Get the WebP or AVIF MIME type from the file signature.
+	 *
+	 * @param string $file_data File contents.
+	 *
+	 * @return 'image/webp'|'image/avif'|null
+	 */
+	private function get_signature_mime( string $file_data ): ?string {
+		$length = 12;
+		$magic  = substr( $file_data, 0, $length );
+		if ( strlen( $magic ) < $length ) {
+			return null;
+		}
+
+		if ( 'RIFF' === substr( $magic, 0, 4 ) && 'WEBP' === substr( $magic, 8, 4 ) ) {
+			return 'image/webp';
+		}
+
+		if ( 'ftyp' === substr( $magic, 4, 4 ) && in_array( substr( $magic, 8, 4 ), [ 'avif', 'avis' ], true ) ) {
+			return 'image/avif';
+		}
+
+		return null;
 	}
 
 	/**

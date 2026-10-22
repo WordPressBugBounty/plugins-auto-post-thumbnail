@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'codeinwp/auto-post-thumbnail',
-        'pretty_version' => 'v5.0.7',
-        'version' => '5.0.7.0',
-        'reference' => '9d83cf395e457b04ed7a9a133af7b3cbf6f5bb12',
+        'pretty_version' => 'v5.0.8',
+        'version' => '5.0.8.0',
+        'reference' => '81fc9edaffe4aea2551754ae11c493b559e9bb91',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,18 +11,18 @@
     ),
     'versions' => array(
         'codeinwp/auto-post-thumbnail' => array(
-            'pretty_version' => 'v5.0.7',
-            'version' => '5.0.7.0',
-            'reference' => '9d83cf395e457b04ed7a9a133af7b3cbf6f5bb12',
+            'pretty_version' => 'v5.0.8',
+            'version' => '5.0.8.0',
+            'reference' => '81fc9edaffe4aea2551754ae11c493b559e9bb91',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
         'codeinwp/themeisle-sdk' => array(
-            'pretty_version' => '3.3.65',
-            'version' => '3.3.65.0',
-            'reference' => 'f650fe856d52ce4e5754557d89ba2f3127ad54d8',
+            'pretty_version' => '3.3.67',
+            'version' => '3.3.67.0',
+            'reference' => 'e1dda44811660a65c3da6994349c054a46686d69',
             'type' => 'library',
             'install_path' => __DIR__ . '/../codeinwp/themeisle-sdk',
             'aliases' => array(),

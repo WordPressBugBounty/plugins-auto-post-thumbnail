@@ -14,6 +14,13 @@ use AutoPostThumbnail\Constants\Options_Schema;
  */
 class Sanitization {
 	/**
+	 * A byte that is not part of a valid UTF-8 sequence; valid multibyte sequences are skipped.
+	 *
+	 * @var string
+	 */
+	private const INVALID_UTF8_BYTE = '/(?:[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})(*SKIP)(*FAIL)|[\x80-\xFF]/';
+
+	/**
 	 * Sanitize an array value.
 	 *
 	 * @param mixed                 $value The value to sanitize.
@@ -182,7 +189,9 @@ class Sanitization {
 	 * @return string
 	 */
 	public static function sanitize_post_title_for_image_generation( $value ) {
-		$value = mb_convert_encoding( $value, 'UTF-8' );
+		$value = function_exists( 'mb_convert_encoding' )
+			? mb_convert_encoding( $value, 'UTF-8' )
+			: preg_replace( self::INVALID_UTF8_BYTE, '?', $value ) ?? $value;
 		$value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 
 		return $value;
