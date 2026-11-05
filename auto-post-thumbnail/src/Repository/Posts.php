@@ -33,6 +33,8 @@ class Posts {
 			'date_end'     => 0,
 			'is_log'       => true,
 			'count'        => 0,
+			'offset'       => 0,
+			'include'      => [],
 			'apt_set_only' => false,
 		];
 
@@ -61,6 +63,12 @@ class Posts {
 
 		$args = [
 			'posts_per_page'   => $params['count'] ? $params['count'] : - 1,
+			'offset'           => (int) $params['offset'],
+			// ID breaks date ties so offset pages stay stable.
+			'orderby'          => [
+				'date' => 'DESC',
+				'ID'   => 'DESC',
+			],
 			'post_status'      => $q_status,
 			'post_type'        => $q_type,
 			'suppress_filters' => true,
@@ -82,6 +90,10 @@ class Posts {
 				'key'     => Apt::PLUGIN_SET_META_KEY,
 				'compare' => 'EXISTS',
 			];
+		}
+
+		if ( $params['include'] ) {
+			$args['post__in'] = $params['include'];
 		}
 
 		if ( $params['category'] ) {

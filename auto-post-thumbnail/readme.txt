@@ -4,7 +4,7 @@ Tags: post thumbnails, featured image, auto featured image, thumbnails, featured
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.0.8
+Stable tag: 5.0.9
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -189,10 +189,10 @@ Please follow the reporting protocols outlined on our [Security Page](https://th
 
 == Changelog ==
 
-#####   Version 5.0.8 (2026-10-22)
+#####   Version 5.0.9 (2026-11-05)
 
-- Fixed featured image generation on servers without image type detection.
-- Fixed post publishing failing without the mbstring PHP extension.
+- Fixed admin dashboard and post list showing only in English.
+- Fixed scheduled generation repeating batches for posts without images
 - Updated dependencies
 
 

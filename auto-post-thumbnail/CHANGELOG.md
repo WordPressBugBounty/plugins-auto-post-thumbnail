@@ -1,3 +1,9 @@
+#####   Version 5.0.9 (2026-11-05)
+
+- Fixed admin dashboard and post list showing only in English.
+- Fixed scheduled generation repeating batches for posts without images
+- Updated dependencies
+
 #####   Version 5.0.8 (2026-10-22)
 
 - Fixed featured image generation on servers without image type detection.

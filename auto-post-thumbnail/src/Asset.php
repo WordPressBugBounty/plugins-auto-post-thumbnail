@@ -94,12 +94,13 @@ class Asset {
 	}
 
 	/**
-	 * Register the script.
+	 * Register the script and its translations.
 	 *
 	 * @return void
 	 */
 	private function register_script() {
 		wp_register_script( $this->handle, $this->src, $this->deps, $this->version, $this->in_footer );
+		wp_set_script_translations( $this->handle, 'auto-post-thumbnail' );
 	}
 
 	/**

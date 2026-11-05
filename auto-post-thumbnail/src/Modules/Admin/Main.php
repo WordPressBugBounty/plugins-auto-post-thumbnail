@@ -381,13 +381,13 @@ class Main extends Base {
 		$pro_product_slug = defined( 'WAPTP_PLUGIN_SLUG' ) ? WAPTP_PLUGIN_SLUG : '';
 
 		$is_pro     = 'valid' === $status;
-		$is_expired = 'expired' === $status || 'active-expired' === $status;
+		$is_expired = in_array( $status, [ 'expired', 'active_expired', 'active-expired' ], true );
 
 		if ( $is_pro ) {
 			// translators: %s is the discount percentage.
 			$config['plugin_meta_message'] = sprintf( __( 'Black Friday Sale - %s off', 'auto-post-thumbnail' ), '30%' );
 			// translators: %1$s - discount, %2$s - discount.
-			$message   = sprintf( __( 'Upgrade your Auto Feature Image Pro plan: %1$s off this week. Already on the plan you need? Renew early and save up to %2$s.', 'auto-post-thumbnail' ), '30%', '20%' );
+			$message   = sprintf( __( 'Upgrade your Auto Featured Image Pro plan: %1$s off this week. Already on the plan you need? Renew early and save up to %2$s.', 'auto-post-thumbnail' ), '30%', '20%' );
 			$cta_label = __( 'See your options', 'auto-post-thumbnail' );
 		} elseif ( $is_expired ) {
 			// translators: %s is the discount percentage.
